@@ -39,27 +39,27 @@ describe("placeShip()", () => {
 
   test("Out of bounds case", () => {
     const board = new Board(10);
-    expect(() => board.placeShip(9, 9, 2, "vertical")).toThrow();
-    expect(() => board.placeShip(-1, -1, 2, "vertical")).toThrow();
+    expect(board.placeShip(9, 9, 2, "vertical")).toBe("outOfBounds");
+    expect(board.placeShip(-1, -1, 2, "vertical")).toBe("outOfBounds");
   });
 
   test("Overlapping case 1", () => {
     const board = new Board(10);
     board.placeShip(0, 0, 1, "vertical");
-    expect(() => board.placeShip(0, 0, 1, "vertical")).toThrow();
+    expect(board.placeShip(0, 0, 1, "vertical")).toBe("overlap");
   });
 
   test("Overlapping case 2", () => {
     const board = new Board(10);
     board.placeShip(9, 9, 0, "horizontal");
     board.placeShip(0, 1, 2, "horizontal");
-    expect(() => board.placeShip(1, 0, 2, "vertical")).toThrow();
+    expect(board.placeShip(1, 0, 2, "vertical")).toBe("overlap");
   });
 
   test("Not overlapping case", () => {
     const board = new Board(10);
     board.placeShip(0, 1, 1, "vertical");
-    expect(() => board.placeShip(0, 0, 1, "vertical")).not.toThrow();
+    expect(board.placeShip(0, 0, 1, "vertical")).not.toBe("overlap");
   });
 });
 
@@ -93,8 +93,8 @@ describe("receiveAttack()", () => {
     board.placeShip(0, 0, 1, "vertical");
     board.receiveAttack(0, 1);
     board.receiveAttack(0, 0);
-    expect(() => board.receiveAttack(0, 1)).toThrow();
-    expect(() => board.receiveAttack(0, 0)).toThrow();
+    expect(board.receiveAttack(0, 1)).toBe("overlap");
+    expect(board.receiveAttack(0, 0)).toBe("overlap");
     expect(board.attacks).toEqual([
       {
         x: 0,
@@ -111,8 +111,8 @@ describe("receiveAttack()", () => {
 
   test("Out of bounds case", () => {
     const board = new Board(10);
-    expect(() => board.receiveAttack(-1, -1)).toThrow();
-    expect(() => board.receiveAttack(10, 10)).toThrow();
+    expect(board.receiveAttack(-1, -1)).toBe("outOfBounds");
+    expect(board.receiveAttack(10, 10)).toBe("outOfBounds");
   });
 
   test("Returns correct results", () => {

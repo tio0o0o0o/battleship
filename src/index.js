@@ -15,3 +15,5 @@ computer.board.placeShip(8, 7, 3, "vertical");
 computer.board.placeShip(2, 6, 2, "horizontal");
 
 const gameController = new GameController("player1", human, computer);
+
+gameController.playGame();

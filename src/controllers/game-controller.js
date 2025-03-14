@@ -6,42 +6,31 @@ const status = document.querySelector(".status");
 const board1 = document.querySelector(".board1");
 const board2 = document.querySelector(".board2");
 const checklist = document.querySelector(".checklist");
+const newGameButton = document.querySelector("#newGame");
 
 const gameView = new GameView(board1, board2, checklist, status);
-const human = new Player("YOU", "human", 10);
-const computer = new Player("COMPUTER", "computer", 10);
 
-human.board.placeShip(0, 0, 2, "horizontal");
-human.board.placeShip(3, 2, 3, "vertical");
-human.board.placeShip(6, 4, 4, "horizontal");
-human.board.placeShip(8, 7, 3, "vertical");
-
-human.board.receiveAttack(0, 0);
-human.board.receiveAttack(3, 2);
-human.board.receiveAttack(6, 4);
-human.board.receiveAttack(8, 7);
-human.board.receiveAttack(1, 0);
-human.board.receiveAttack(9, 9);
-
-computer.board.placeShip(0, 0, 2, "horizontal");
-computer.board.placeShip(3, 2, 3, "vertical");
-computer.board.placeShip(6, 4, 4, "horizontal");
-computer.board.placeShip(8, 7, 3, "vertical");
-computer.board.receiveAttack(0, 0);
-computer.board.receiveAttack(3, 2);
-computer.board.receiveAttack(6, 4);
-computer.board.receiveAttack(8, 7);
-computer.board.receiveAttack(1, 0);
-computer.board.receiveAttack(9, 9);
+let human;
+let computer;
+let gameController;
 
 class GameController {
-  constructor(turn = "player1") {
+  constructor(turn = "player1", shipsToPlace = [5, 4, 3, 3, 2]) {
     this.turn = turn;
+    this.shipsToPlace = shipsToPlace;
   }
 
-  initializeUI() {
+  initialize() {
+    this.placeRandomShips(human.board);
+    this.placeRandomShips(computer.board);
     this.updatePlayerUI();
     this.updateComputerUI();
+    UI.assignFunction({
+      elements: [newGameButton],
+      functionToAssign: () => {
+        newGame();
+      },
+    });
   }
 
   updatePlayerUI() {
@@ -79,9 +68,13 @@ class GameController {
     }
   }
 
+  static randInt(max) {
+    return Math.floor(Math.random() * max);
+  }
+
   async computerChoice(delay = 500) {
     const notAttacked = human.board.notAttacked();
-    const randomInt = Math.floor(Math.random() * notAttacked.length);
+    const randomInt = GameController.randInt(notAttacked.length);
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(notAttacked[randomInt]);
@@ -102,8 +95,29 @@ class GameController {
     }
     return `${this.turn} turn`;
   }
+
+  placeRandomShips(board) {
+    this.shipsToPlace.forEach((shipLength) => {
+      while (true) {
+        try {
+          const randRotation = ["vertical", "horizontal"][
+            GameController.randInt(2)
+          ];
+          const randX = GameController.randInt(board.size);
+          const randY = GameController.randInt(board.size);
+          board.placeShip(randX, randY, shipLength, randRotation);
+          return;
+        } catch {}
+      }
+    });
+  }
 }
 
-const gameController = new GameController();
-gameController.initializeUI();
-human.board.notAttacked();
+function newGame() {
+  human = new Player("YOU", "human", 10);
+  computer = new Player("COMPUTER", "computer", 10);
+  gameController = new GameController();
+  gameController.initialize();
+}
+
+newGame();

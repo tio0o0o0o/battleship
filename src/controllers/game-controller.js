@@ -44,11 +44,13 @@ class GameController {
 
   player1Turn(x, y) {
     if (this.turn === "player1" && !this.checkWin()) {
-      computer.board.receiveAttack(x, y);
-      this.updateComputerUI();
-      this.turn = "player2";
-      gameView.updateStatus(status, this.checkStatus());
-      this.player2Turn();
+      try {
+        computer.board.receiveAttack(x, y);
+        this.updateComputerUI();
+        this.turn = "player2";
+        gameView.updateStatus(status, this.checkStatus());
+        this.player2Turn();
+      } catch {}
     }
   }
 

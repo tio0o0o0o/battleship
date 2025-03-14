@@ -1,5 +1,6 @@
 const GameView = require("../views/game-view.js");
 const Player = require("../models/player.js");
+const UI = require("../utility/ui.js");
 
 const status = document.querySelector(".status");
 const board1 = document.querySelector(".board1");
@@ -33,16 +34,56 @@ computer.board.receiveAttack(8, 7);
 computer.board.receiveAttack(1, 0);
 computer.board.receiveAttack(9, 9);
 
-function updateScreen() {
-  gameView.updatePlayerBoard(human.board);
-  gameView.updateComputerBoard(computer.board);
-  const board2Cells = document.querySelectorAll(".cell2");
-  board2Cells.forEach((cell) => {
-    cell.addEventListener("click", () => {
-      computer.board.receiveAttack(cell.dataset.x, cell.dataset.y);
-      updateScreen();
+class GameController {
+  constructor(turn = "player1") {
+    this.turn = turn;
+  }
+
+  initializeUI() {
+    this.updatePlayerUI();
+    this.updateComputerUI();
+  }
+
+  updatePlayerUI() {
+    gameView.updatePlayerBoard(human.board);
+  }
+
+  updateComputerUI() {
+    gameView.updateComputerBoard(computer.board);
+    const board2Cells = document.querySelectorAll(".cell2");
+    UI.assignFunction({
+      elements: board2Cells,
+      functionToAssign: (cell) => {
+        this.player1Turn(cell.dataset.x, cell.dataset.y);
+      },
     });
-  });
+  }
+
+  player1Turn(x, y) {
+    if (this.turn === "player1") {
+      computer.board.receiveAttack(x, y);
+      this.updateComputerUI();
+      this.turn = "player2";
+      this.player2Turn();
+    }
+  }
+
+  player2Turn() {
+    if (this.turn === "player2") {
+      const target = this.computerChoice();
+      human.board.receiveAttack(target.x, target.y);
+      this.updatePlayerUI();
+      this.turn = "player1";
+    }
+  }
+
+  computerChoice() {
+    const notAttacked = human.board.notAttacked();
+    const randomInt = Math.floor(Math.random() * notAttacked.length);
+    return notAttacked[randomInt];
+  }
 }
 
-updateScreen();
+const gameController = new GameController();
+gameController.initializeUI();
+human.board.notAttacked();

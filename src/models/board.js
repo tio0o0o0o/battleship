@@ -9,6 +9,29 @@ class Board {
     this.attacks = [];
   }
 
+  notAttacked() {
+    let notAttacked = [];
+
+    for (let i = 0; i < this.size; i++) {
+      for (let ii = 0; ii < this.size; ii++) {
+        notAttacked.push({ x: i, y: ii });
+      }
+    }
+
+    notAttacked = notAttacked.filter((notAttackedElement) => {
+      return (
+        this.attacks.find((attacksElement) => {
+          return (
+            attacksElement.x === notAttackedElement.x &&
+            attacksElement.y === notAttackedElement.y
+          );
+        }) === undefined
+      );
+    });
+
+    return notAttacked;
+  }
+
   placeShip(x, y, length, rotation) {
     // Out of bounds case
     if (x < 0 || y < 0) {

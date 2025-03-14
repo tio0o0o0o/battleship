@@ -25,12 +25,6 @@ class GameController {
     this.placeRandomShips(computer.board);
     this.updatePlayerUI();
     this.updateComputerUI();
-    UI.assignFunction({
-      elements: [newGameButton],
-      functionToAssign: () => {
-        newGame();
-      },
-    });
   }
 
   updatePlayerUI() {
@@ -121,3 +115,10 @@ function newGame() {
 }
 
 newGame();
+
+UI.assignFunction({
+  elements: [newGameButton],
+  functionToAssign: () => {
+    newGame();
+  },
+});

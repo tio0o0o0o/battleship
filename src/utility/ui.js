@@ -26,6 +26,14 @@ class UI {
     if (parent) parent.appendChild(element);
     return element;
   }
+
+  static assignFunction({ elements, functionToAssign, event = "click" } = {}) {
+    elements.forEach((element, index) => {
+      element.addEventListener(event, () => {
+        functionToAssign(element, index);
+      });
+    });
+  }
 }
 
 module.exports = UI;

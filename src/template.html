@@ -3,18 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Battleship</title>
   </head>
   <body>
-    <main>
-      <div class="top">
-        <div class="title">BATTLESHIP</div>
-        <div class="status">Deploy fleet</div>
+    <div class="title">Battleship</div>
+    <div class="status">Your turn</div>
+    <div class="boardsWrapper">
+      <div class="board1Wrapper">
+        <div class="name">YOU</div>
+        <div class="board1"></div>
       </div>
-      <div class="bottom"></div>
-      <div class="left"></div>
-      <div class="right"></div>
-      <div class="middle"></div>
-    </main>
+      <div class="board2Wrapper">
+        <div class="name">COMPUTER</div>
+        <div class="board2"></div>
+      </div>
+      <div class="checklistWrapper">
+        <div class="checklist"></div>
+      </div>
+    </div>
+    <button id="newGame">New Game</button>
   </body>
 </html>

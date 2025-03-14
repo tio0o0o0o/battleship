@@ -1,30 +1,42 @@
-class PlayerIconDictionary {
-  static 0 = "~";
-  static 1 = "□";
-  static miss = "•";
-  static hit = "⛝";
-  static sunk = "■";
+const UI = require("../utility/ui.js");
+const crossImg = require("../assets/images/cross.svg");
+const dotImg = require("../assets/images/dot.svg");
+const transparentImg = require("../assets/images/transparent.png");
+
+class Board1Dict {
+  static 0 = { backgroundColor: "white", icon: transparentImg };
+  static 1 = { backgroundColor: "grey", icon: transparentImg };
+  static miss = { backgroundColor: "white", icon: dotImg };
+  static hit = { backgroundColor: "grey", icon: crossImg };
+  static sunk = { backgroundColor: "red", icon: transparentImg };
 }
 
-class EnemyIconDictionary {
-  static 0 = "~";
-  static 1 = "~";
-  static miss = "•";
-  static hit = "⛝";
-  static sunk = "■";
+class Board2Dict {
+  static 0 = { backgroundColor: "white", icon: transparentImg };
+  static 1 = { backgroundColor: "white", icon: transparentImg };
+  static miss = { backgroundColor: "white", icon: dotImg };
+  static hit = { backgroundColor: "grey", icon: crossImg };
+  static sunk = { backgroundColor: "red", icon: transparentImg };
 }
 
 class GameView {
-  static boardToTable(board) {
+  constructor(board1, board2, checklist, status) {
+    this.board1 = board1;
+    this.board2 = board2;
+    this.checklist = checklist;
+    this.status = status;
+  }
+
+  static boardToTable(boardData) {
     const rows = [];
-    for (let i = 0; i < board.size; i++) {
+    for (let i = 0; i < boardData.size; i++) {
       const row = [];
-      for (let i = 0; i < board.size; i++) {
+      for (let i = 0; i < boardData.size; i++) {
         row.push(0);
       }
       rows.push(row);
     }
-    board.ships.forEach((ship) => {
+    boardData.ships.forEach((ship) => {
       if (ship.rotation === "vertical") {
         for (let i = 0; i < ship.length; i++) {
           rows[ship.y + i][ship.x] = 1;
@@ -36,10 +48,10 @@ class GameView {
         }
       }
     });
-    board.attacks.forEach((attack) => {
+    boardData.attacks.forEach((attack) => {
       rows[attack.y][attack.x] = attack.result;
     });
-    board.ships.forEach((ship) => {
+    boardData.ships.forEach((ship) => {
       if (ship.isSunk()) {
         if (ship.rotation === "vertical") {
           for (let i = 0; i < ship.length; i++) {
@@ -56,48 +68,105 @@ class GameView {
     return rows;
   }
 
-  static printBoards(player1, player2) {
-    const rows1 = this.boardToTable(player1.board);
-    const rows2 = this.boardToTable(player2.board);
-
-    let namesPrint = player1.name + "       ";
-
-    for (let i = 0; i < rows1.length; i++) {
-      namesPrint += "  ";
-    }
-
-    namesPrint = namesPrint.slice(0, player1.name.length * -1);
-
-    namesPrint += player2.name;
-
-    console.log(namesPrint);
-
-    for (let i = rows1.length - 1; i >= 0; i--) {
-      let printLine = i + " ";
-      rows1[i].forEach((value) => {
-        printLine += PlayerIconDictionary[value] + " ";
+  updatePlayerBoard(boardData) {
+    UI.removeChildElements(this.board1);
+    const grid = UI.createElement({
+      tag: "div",
+      attributes: ["class", "grid1"],
+      styles: {
+        height: "100%",
+        display: "grid",
+        gridTemplateColumns: `repeat(${boardData.size}, 1fr)`,
+        gridTemplateRows: `repeat(${boardData.size}, 1fr)`,
+      },
+      parent: this.board1,
+    });
+    const boardTable = GameView.boardToTable(boardData);
+    for (let rowI = boardTable.length - 1; rowI >= 0; rowI--) {
+      const row = boardTable[rowI];
+      row.forEach((cell, columnI) => {
+        UI.createElement({
+          tag: "img",
+          attributes: [
+            "class",
+            "cell1",
+            "data-x",
+            columnI,
+            "data-y",
+            rowI,
+            "src",
+            Board1Dict[cell].icon,
+          ],
+          parent: grid,
+          styles: {
+            width: "100%",
+            height: "100%",
+            border: "1px solid black",
+            backgroundColor: Board1Dict[cell].backgroundColor,
+          },
+        });
       });
+    }
+  }
 
-      printLine += "  |  " + i + " ";
-      rows2[i].forEach((value) => {
-        printLine += EnemyIconDictionary[value] + " ";
+  updateComputerBoard(boardData) {
+    UI.removeChildElements(this.board2);
+    const grid = UI.createElement({
+      tag: "div",
+      attributes: ["class", "grid2"],
+      styles: {
+        height: "100%",
+        display: "grid",
+        gridTemplateColumns: `repeat(${boardData.size}, 1fr)`,
+        gridTemplateRows: `repeat(${boardData.size}, 1fr)`,
+      },
+      parent: this.board2,
+    });
+    const boardTable = GameView.boardToTable(boardData);
+    for (let rowI = boardTable.length - 1; rowI >= 0; rowI--) {
+      const row = boardTable[rowI];
+      row.forEach((cell, columnI) => {
+        UI.createElement({
+          tag: "img",
+          attributes: [
+            "class",
+            "cell2",
+            "data-x",
+            columnI,
+            "data-y",
+            rowI,
+            "src",
+            Board2Dict[cell].icon,
+          ],
+          parent: grid,
+          styles: {
+            width: "100%",
+            height: "100%",
+            border: "1px solid black",
+            backgroundColor: Board2Dict[cell].backgroundColor,
+          },
+        });
       });
-
-      console.log(printLine);
     }
+  }
 
-    let columnsPrint = " ";
-    for (let i = 0; i < rows1.length; i++) {
-      columnsPrint += " " + i;
+  updateChecklist() {}
+
+  updateStatus(status, statusData) {
+    switch (statusData) {
+      case "player1 won":
+        status.textContent = "You won";
+        break;
+      case "player2 won":
+        status.textContent = "Computer won";
+        break;
+      case "player1 turn":
+        status.textContent = "Your turn";
+        break;
+      case "player2 turn":
+        status.textContent = "Computer's turn";
+        break;
     }
-    columnsPrint += "   |   ";
-    for (let i = 0; i < rows1.length; i++) {
-      columnsPrint += " " + i;
-    }
-
-    console.log(columnsPrint);
-
-    console.log();
   }
 }
 

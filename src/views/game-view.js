@@ -151,6 +151,23 @@ class GameView {
   }
 
   updateChecklist() {}
+
+  updateStatus(status, statusData) {
+    switch (statusData) {
+      case "player1 won":
+        status.textContent = "You won";
+        break;
+      case "player2 won":
+        status.textContent = "Computer won";
+        break;
+      case "player1 turn":
+        status.textContent = "Your turn";
+        break;
+      case "player2 turn":
+        status.textContent = "Computer's turn";
+        break;
+    }
+  }
 }
 
 module.exports = GameView;

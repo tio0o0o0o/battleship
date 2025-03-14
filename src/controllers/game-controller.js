@@ -60,27 +60,47 @@ class GameController {
   }
 
   player1Turn(x, y) {
-    if (this.turn === "player1") {
+    if (this.turn === "player1" && !this.checkWin()) {
       computer.board.receiveAttack(x, y);
       this.updateComputerUI();
       this.turn = "player2";
+      gameView.updateStatus(status, this.checkStatus());
       this.player2Turn();
     }
   }
 
-  player2Turn() {
-    if (this.turn === "player2") {
-      const target = this.computerChoice();
+  async player2Turn() {
+    if (this.turn === "player2" && !this.checkWin()) {
+      const target = await this.computerChoice();
       human.board.receiveAttack(target.x, target.y);
       this.updatePlayerUI();
       this.turn = "player1";
+      gameView.updateStatus(status, this.checkStatus());
     }
   }
 
-  computerChoice() {
+  async computerChoice(delay = 500) {
     const notAttacked = human.board.notAttacked();
     const randomInt = Math.floor(Math.random() * notAttacked.length);
-    return notAttacked[randomInt];
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(notAttacked[randomInt]);
+      }, delay);
+    });
+  }
+
+  checkWin() {
+    if (human.board.allSunk()) return "player2";
+    if (computer.board.allSunk()) return "player1";
+    return false;
+  }
+
+  checkStatus() {
+    const winStatus = this.checkWin();
+    if (winStatus) {
+      return `${winStatus} won`;
+    }
+    return `${this.turn} turn`;
   }
 }
 

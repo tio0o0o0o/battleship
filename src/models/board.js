@@ -34,18 +34,18 @@ class Board {
 
   placeShip(x, y, length, rotation) {
     // Out of bounds case
-    if (x < 0 || y < 0) return "outOfBounds";
+    if (x < 0 || y < 0) throw new Error("Out of bounds");
     if (
       rotation === "vertical" &&
       (y + length - 1 > this.size - 1 || x > this.size - 1)
     ) {
-      return "outOfBounds";
+      throw new Error("Out of bounds");
     }
     if (
       rotation === "horizontal" &&
       (x + length - 1 > this.size - 1 || y > this.size - 1)
     ) {
-      return "outOfBounds";
+      throw new Error("Out of bounds");
     }
 
     // Overlapping case
@@ -58,7 +58,9 @@ class Board {
         line2 = new Line(ship.x, ship.y, ship.x, ship.y + ship.length - 1);
       if (ship.rotation === "horizontal")
         line2 = new Line(ship.x, ship.y, ship.x + ship.length - 1, ship.y);
-      if (Line.overlaps(line1, line2)) return "overlap";
+      if (Line.overlaps(line1, line2)) {
+        throw new Error("Overlap");
+      }
     }
 
     this.ships.push(new Ship(x, y, length, rotation));
@@ -67,12 +69,12 @@ class Board {
   receiveAttack(x, y) {
     // Overlapping case
     for (const attack of this.attacks) {
-      if (x === attack.x && y === attack.y) return "overlap";
+      if (x === attack.x && y === attack.y) throw new Error("Overlapping");
     }
 
     // Out of bounds case
     if (x < 0 || x > this.size - 1 || y < 0 || y > this.size - 1) {
-      return "outOfBounds";
+      throw new Error("Out of bounds");
     }
 
     const attackPoint = new Line(x, y, x, y);
